@@ -13,29 +13,29 @@ let getData=function(req,callback){
 }
 let postData=function(req,callback){
     fs.readFile(path.join(__dirname,'./db.json'),(err,data)=>{
-     if(err){
-         return callback(err,{});
-     }   
-    let dbData=JSON.parse(data);
-    
-    //console.log('articles',dbData.articles);
-    dbData.articles.push(req.body);
-    //console.log('articles modified',dbData.articles);
-    fs.writeFile(path.join(__dirname,'./db.json'),JSON.stringify(dbData),(err)=>{
 
-        // res.write('data saved');
-         //res.end();
-         return callback(null,JSON.stringify(dbData));
+    try{
+        let dbData=JSON.parse(data);
+        
+        //console.log('articles',dbData.articles);
+        dbData.articles.push(req.body);
+        //console.log('articles modified',dbData.articles);
+        fs.writeFile(path.join(__dirname,'./db.json'),JSON.stringify(dbData),(err)=>{
 
-})
+            // res.write('data saved');
+            //res.end();
+            return callback(null,JSON.stringify(dbData));
+
+        })
+    }catch(err){
+        return callback(err,{});
+    }
 
 })
 }
 let deleteData=function(req,callback){
      fs.readFile(path.join(__dirname,'./db.json'),(err,data)=>{
-         if(err){
-             return callback(err,{});
-         }
+        try{
         let dbData=JSON.parse(data);
         let dupDbData=[];
         dbData.articles.forEach(function(element,index) {
@@ -51,16 +51,18 @@ let deleteData=function(req,callback){
              //res.write('data saved');
             // res.end(JSON.stringify(dbData));
             return callback(null,JSON.stringify(dbData));
-
+       
     });
+    }catch(err){
+        return callback(err,{});
+    }
    
 });
 }
 let patchData=function(req,callback){
      fs.readFile(path.join(__dirname,'./db.json'),(err,data)=>{
-        if(err){
-            return callback(err,{});
-        }
+      try{
+       
          let dbData=JSON.parse(data);
          
          dbData.articles.forEach(function(element,index) {
@@ -75,6 +77,10 @@ let patchData=function(req,callback){
               return callback(null,JSON.stringify(dbData));
  
      });
+    }catch(error){
+        //console.log(error);
+        return callback(error,{});
+    }
 })
 }
 let obj={
