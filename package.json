@@ -4,18 +4,21 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start":"node api.js",
-    "lint":"eslint api.js"
+    "test": "mocha",
+    "start": "node api.js",
+    "lint": "eslint api.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "assert": "^1.4.1",
     "express": "^4.16.1"
   },
   "devDependencies": {
+    "chai": "^4.1.2",
     "eslint": "^4.8.0",
     "eslint-config-airbnb-base": "^12.0.2",
-    "eslint-plugin-import": "^2.7.0"
+    "eslint-plugin-import": "^2.7.0",
+    "supertest": "^3.0.0"
   }
 }
