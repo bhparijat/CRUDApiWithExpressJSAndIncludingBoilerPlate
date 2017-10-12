@@ -5,18 +5,17 @@ const path = require('path');
 const moduleOneController = require('./newsApi.controller.js')
 router.get('/articles',(req,res,next)=>{
     res.writeHead(200,{"content-type":"application/json"});
-    
+    console.log('inside get router');
       moduleOneController.getData(req,(err,result)=>{
           if(err){
             return res.status(500).end(
-                JSON.stringify( 'Something went wrong with get, please try later..!')
+                JSON.stringify( err)
               );
           }
           else{
-            setTimeout(()=>{
-                console.log('simulating database');
+           
                 return res.end(result);
-            },5000);
+           
              
           }
       });
@@ -32,7 +31,7 @@ router.post('/articles',(req,res,next)=>{
     moduleOneController.postData(req,(err,result)=>{
         if(err){
             return res.status(500).end(
-                JSON.stringify( 'Something went wrong with post, please try later..!')
+                JSON.stringify( err)
               );
         }
         else{
@@ -51,7 +50,7 @@ router.delete('/articles/:id',(req,res,next)=>{
         moduleOneController.deleteData(req,(err,result)=>{
             if(err){
                 return res.status(500).end(
-                    JSON.stringify( 'Something went wrong with delete, please try later..!')
+                    JSON.stringify(  err)
                   );
             }
             else{
@@ -67,7 +66,7 @@ router.patch('/updateData/:id/',(req,res,next)=>{
         moduleOneController.patchData(req,(err,result)=>{
             if(err){
                 return res.status(500).end(
-                    JSON.stringify( 'Something went wrong, please try later..!')
+                    JSON.stringify( err)
                   );
             }
             else{

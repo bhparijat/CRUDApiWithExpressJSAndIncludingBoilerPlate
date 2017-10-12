@@ -1,16 +1,32 @@
-
-
-
 const express = require('express');
 const router = express.Router();
 const path =require('path');
 const morgan =require('morgan');
-//const app = express();
-//const fs = require('fs');
-const bodyParser = require('body-parser');
-//const moduleOneRouter = require('./moduleOneRouter.js');
 
+function setMongooseConnections()
+{
 
+  const mongoose = require('mongoose');
+  const connect = mongoose.connect('mongodb://localhost/newsAppDataBase',{
+    useMongoClient:true,
+  });
+  const db = mongoose.connection;
+ db.on('connected', function() {
+    console.log('Mongoose is now connected to ');
+  });
+
+ db.on('error', function(err) {
+    console.log('Error in Mongoose connection: ', err);
+  });
+
+  db.on('disconnected', function() {
+    console.log('Mongoose is now disconnected..!');
+  });
+
+  
+  //const moduleOneRouter = require('./moduleOneRouter.js');
+
+}
 
 function createApp(){
     const app=express();
@@ -32,12 +48,14 @@ function setRoutes(app){
         });
       });
     
-     console.log(__dirname); 
+    // console.log(__dirname); 
     return app;
 }
 function setupStaticRoutes(app) {
-    let path="/home/parijat/Downloads/express_server";
-    app.use(express.static(path.resolve(__dirname, '../', '/angular/NewsApp/dist')));
+   // let path="/home/parijat/Downloads/express_server";
+    
+    app.use(express.static(path.join(__dirname, '../', '/angular/NewsApp/dist')));
+    console.log(path.join(__dirname, '../', '/angular/NewsApp/dist'));
     return app;
   }
 function setupMiddlewares(app) {
@@ -54,7 +72,8 @@ function setupMiddlewares(app) {
   }
 
 let app=createApp();
-   
+app=setupStaticRoutes(app);  
 app=setupMiddlewares(app);
 app=setRoutes(app);
-app.listen(8000);
+setMongooseConnections();
+app.listen(4200);
