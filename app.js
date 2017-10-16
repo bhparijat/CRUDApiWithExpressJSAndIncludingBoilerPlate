@@ -23,6 +23,7 @@ function setMongooseConnections()
     console.log('Mongoose is now disconnected..!');
   });
 
+
   
   //const moduleOneRouter = require('./moduleOneRouter.js');
 
@@ -40,6 +41,7 @@ function setRoutes(app){
         next();
       });
     app.use('/',require(path.join(__dirname, './newsApi')));
+    app.use('/',require(path.join(__dirname, './users')));
     app.use(function(req, res, next) {
         var err = new Error('Resource not found');
         err.status = 404;
@@ -54,8 +56,8 @@ function setRoutes(app){
 function setupStaticRoutes(app) {
    // let path="/home/parijat/Downloads/express_server";
     
-    app.use(express.static(path.join(__dirname, '../', '/angular/NewsApp/dist')));
-    console.log(path.join(__dirname, '../', '/angular/NewsApp/dist'));
+    app.use(express.static(path.join(__dirname, '../', '/angular/NewsApiAM/dist')));
+    console.log(path.join(__dirname, '../', '/angular/NewsApiAM/dist'));
     return app;
   }
 function setupMiddlewares(app) {

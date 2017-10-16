@@ -9,7 +9,7 @@ let getDataMongo = function (req,callback){
         if(err)
          throw err;
         else{
-         // console.log(results);
+          //console.log('reasults',results);
          return callback(null,JSON.stringify(results))
         }
     }catch(err){
@@ -20,8 +20,23 @@ let getDataMongo = function (req,callback){
 }
 let postDataMongo = function(req,callback){
     let toSaveArticle=new newsApi(req.body);
-        //toSaveArticle=req.body;
-       // console.log(toSaveArticle);
+        let  checkDup={
+            author:toSaveArticle.author,
+            title:toSaveArticle.title,
+            description:toSaveArticle.description
+        }
+       newsApi.findOne(checkDup,function(err,res){
+           //console.log('result',res);
+           console.log(err);
+            try{
+                if(err)
+                throw err;
+                else if(res != null)
+                throw new Error('duplicate exists')
+            }catch(err){
+            return callback(err,null);
+            }
+        })
     toSaveArticle.save(function(err,toSaveArticle,numAffectted){
         try{
 

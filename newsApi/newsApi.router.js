@@ -1,8 +1,10 @@
-
 const express = require('express');
 const router = express.Router();
 const path = require('path');
+const passport = require('passport');
+const local = require('passport-local').Strategy;
 const moduleOneController = require('./newsApi.controller.js')
+const moduleOneCassandraController = require('./newsApiUser.controller.js')
 router.get('/articles',(req,res,next)=>{
     res.writeHead(200,{"content-type":"application/json"});
     console.log('inside get router');
@@ -75,4 +77,11 @@ router.patch('/updateData/:id/',(req,res,next)=>{
         });
      
 })
+router.get('/dashboard',(req,res,next)=>{
+    //res.redirect('/dashboard')
+})
+router.post('/register/api',(req,res,next)=>{
+    console.log('register api called');
+})
+
 module.exports=router;
