@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const path =require('path');
 const morgan =require('morgan');
-
+const createConnection=require('./users/users.schema.js');
+const passport = require('passport');
 function setMongooseConnections()
 {
 
@@ -40,7 +41,7 @@ function setRoutes(app){
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         next();
       });
-    app.use('/',require(path.join(__dirname, './newsApi')));
+//uncomment it for mongoose    app.use('/',require(path.join(__dirname, './newsApi')));
     app.use('/',require(path.join(__dirname, './users')));
     app.use(function(req, res, next) {
         var err = new Error('Resource not found');
@@ -72,10 +73,16 @@ function setupMiddlewares(app) {
   
     return app;
   }
-
+function initializepassport(app){
+  app.use(passport.initialize());
+  return app;
+}
+createConnection();
 let app=createApp();
+app = initializepassport(app);
 app=setupStaticRoutes(app);  
 app=setupMiddlewares(app);
 app=setRoutes(app);
-setMongooseConnections();
+
+//setMongooseConnections();
 app.listen(4200);

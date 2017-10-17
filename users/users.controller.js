@@ -1,109 +1,56 @@
 const dse = require('dse-driver');
-const async=require('async');
-const client = new dse.Client({ contactPoints: ['127.0.0.1'], protocolOptions: { maxVersion:4 }
-});
-const createKeyspaceQuery=`CREATE KEYSPACE user_database WITH REPLICATION = {'class': 'SimpleStrategy', 'replication_factor': '1'}`
-const createTable=`create table users("username" text primary key ,"email" text,"contact" text,"password" blob)`;
+const insertQuery = `insert into users ("username","email","contact","password") values(?,?,?,?)`;
 
-const createConnection =function createConnection(){
-async.waterfall([
-   function(callback){
-       client.connect(function(err,result){
-           if(err){
-               callback(err,"eroor in connect");
-           }
-       
-           console.log('cassandra connected');
-           console.log(Object.keys(client.metadata.keyspaces));
-           console.log(Object.keys(client.metadata.keyspaces).includes('user_database'));
-           callback(null,Object.keys(client.metadata.keyspaces).includes('user_database'));
-       });
-   },    
-   
-       function(check,callback) {
 
-           if(check===false){
-               client.execute(createKeyspaceQuery,function(err) {
-               if (!err) {
-                   console.log("new keyspace created");
-                   console.log(Object.keys(client.metadata.keyspaces));
-                   callback(null,false);
-               }
-               else{
-                   console.log(err);
-                   console.log("error in keyspace creation");
-                   callback(err,"eror inkeyspace");
-               }
-         
-           });
-       }
-       else{
-           callback(null,false);
-       }
-       
-       } ,
-       function(check,callback) {
-           if(check===false){
-               client.execute("use user_database", (err,result) =>{
-                   if(err){
-                       console.log("err",err);
-                       callback(err,"use datase error");
-                   }
+const insertData =function(req,callback){
+    const username=req.body.username;
+    const email=req.body.email;
+    const contact=req.body.contact;
+    const password=Buffer.from(req.body.password,"utf8");
+    const param=[username,email,contact,password];
+    const client = new dse.Client({ contactPoints: ['127.0.0.1'], protocolOptions: { maxVersion:4 }
+    ,keyspace:'user_database'});
+    const insertQuery = `insert into users ("username","email","contact","password") values(?,?,?,?)`;
 
-                   else {
-                       callback(null,true);
-                   }
-               });
-           }
-           else{
-               callback(null,true);
-           }
-       },
-       function(check,callback){
-           
-           if(check===false){
-           client.execute(createTable,(err,result) =>{
-                       if(err){
-                           console.log("err",err);
-                           callback(err,"create table error");
-                       }
-                       else {
-                       console.log("table created");
-                       callback(null,true);
-                       }
-               
-                   });
-               }
-               else{
-                   callback(null,true);
-               }        
-       },
-       function(check,callback){
-           client.execute("use user_database", (err,result) =>{
-               console.log("use database when database exists method");
-               if(err){
-       
-                   console.log("err",err);
-                   callback(err,"error");
-               }
-               else{
-               console.log("using database");
-               callback(null,'using database')
-               }
-           });
-       
-       },
+    client.execute(insertQuery,param, function(err, result) {
+          if(err){
+               console.log("error");
+                callback(err,req.body);
+            }
+            else{
+            console.log("inserted");
+            callback(null,req.body);
+            }
 
-],(err,result) =>{
-   if(err){
-       console.log("error in async series",err);
-   }
-   else {
-       console.log("connection successfull");
-       console.log(result);
-       
-   }
-});
-return client;
+          });
+
+};  
+const sendDataById=function(user,callback){
+    const params=[user.username];
+    console.log(params);
+    const client = new dse.Client({ contactPoints: ['127.0.0.1'], protocolOptions: { maxVersion:4 }
+    ,keyspace:'user_database'});
+    const selectQuery=`select username,email,contact,password from user_database.users where username = ?`;
+    client.execute(selectQuery, params ,function(err, result) {
+        console.log("client execute");
+        if(err){
+            console.log("error");
+            callback(err,{});
+        }
+        else if(result.rowLength == 0){
+           callback(new Error('user name not found'));
+        }else if(result.rows['0'].password != user.password){
+           callback(new Error('password does not match please try again'));
+        }
+        else
+        {
+        console.log("display");
+  
+        callback(null,result.rows['0']);
+    }
+      });
 };
-module.exports=createConnection;
+module.exports={
+    insertData,
+    sendDataById
+}; 
